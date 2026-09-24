@@ -1,0 +1,7 @@
+*; start
+txt; Wowie zowie!\nAn incredible test of the engine!
+txt; But who could forsee the future but me?\nChoose, now!
+choice; I'll Be Back; start; I'll Continue; ;
+txt; That's right, that's right!
+txt; To prove my point...\nI'll make a super long dialogue!\nThat'l show them!!\nSee how good I'm doing!!\nSee how good I'm doing!!
+unfrz;

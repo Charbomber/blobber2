@@ -23,15 +23,18 @@ public class Textbox : MonoBehaviour {
     // im lazy
     private Vector3 textmeshpos;
 
+    // whether or not there is a textbox waiting after this
     public bool nextbox = false;
+    public ScriptTrigger myScript;
 
     public PlayerMove player;
 
-    // fuk u Unity/C# Styleguide camelCase foreva!!!!!!!!!
-    void setText(string myTxt) {
+    // after realizing that the rest of my game is following Unity Style Guide i would like to make an apology to it
+    // (but not really, camelCase is better)
+    void SetText(string myTxt) {
         text = myTxt;
     }
-    string getText() {
+    string GetText() {
         return text;
     }
 
@@ -92,7 +95,12 @@ public class Textbox : MonoBehaviour {
             }
             
             // no more text, so remove textbox
-            if (!nextbox) {player.frozen = false;} // plus unfreeze if not last textbox!
+            if (!nextbox && !myScript) {player.frozen = false;} // plus unfreeze if not last textbox!
+            else { // if there *IS* a next box though...
+                if (myScript) { // continue my script so it can make the next box
+                    player.ScriptInterpret.Interpret(myScript, "txtDone"); // yuuuup
+                }
+            }
             Destroy(gameObject);
         }
 

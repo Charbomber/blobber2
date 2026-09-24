@@ -1,5 +1,0 @@
-*; start
-txt; Wowie zowie! An incredible test of the engine!
-txt; But who could forsee the future but me?\p\nChoose, now!
-choice; I'll Be Back; start; I'll Continue; ;
-txt; That's right, that's right!

@@ -14,6 +14,8 @@ public class PlayerStats : MonoBehaviour {
     [System.NonSerialized]
     public Dictionary<string, string> scriptFlag = new Dictionary<string, string>();
 
+    public PlayerMove player;
+
     void Start() {
         level = 1;
         exp = 0;

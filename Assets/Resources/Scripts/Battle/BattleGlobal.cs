@@ -1,6 +1,7 @@
 using UnityEngine;
 
-public class BattleGlobal : ScriptableObject {
+//[CreateAssetMenu(fileName = "BattleGlobal", menuName = "Scriptable Objects/BattleGlobal")]
+public class BattleGlobal {
 
     public enum stat : byte {
         str, // Strength

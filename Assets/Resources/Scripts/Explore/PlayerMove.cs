@@ -1,6 +1,9 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+// PlayerMove has become quite the misnomer, right?
+// Shoulda just been 'Player'. Aw, hell.
+// I don't plan projects ahead of time, professionals would hate me.
 public class PlayerMove : MonoBehaviour {
     float lerp = 0.0f; // how far player is in moving (if thats confusing)
 
@@ -71,6 +74,8 @@ public class PlayerMove : MonoBehaviour {
         battle
     }
     public gameState playerState = gameState.explore;*/
+    public ScriptInterpret ScriptInterpret = new ScriptInterpret();
+    public BattleGlobal BattleGlobal = new BattleGlobal();
 
     // [         ]
     // [ PREFABS ]
@@ -205,7 +210,6 @@ public class PlayerMove : MonoBehaviour {
         // if there's movement modifiers check for that
         RaycastHit hit;
         bool modCast = Physics.Raycast(transform.position, checkDir, out hit, GRID_SIZE, modLayer);
-        //Debug.Log("modCast: "+modCast.ToString());
         if (modCast) {
             // lets get the MovementModifier
             var hitOb = hit.collider.gameObject.GetComponent<MovementModifier>();
@@ -215,6 +219,17 @@ public class PlayerMove : MonoBehaviour {
                 targetPos += hitOb.moveMod;
                 targetAngle = Quaternion.Euler(targetAngle.eulerAngles + hitOb.rotMod);
                 if (hitOb.myHeight != -1 && hitOb.myHeight == worldHeight) {worldHeight = hitOb.newHeight;} // update world height if applicable
+            }
+        }
+
+        // let's also check for script triggers here
+        // I realize this also means tiles with movement modifiers can't also have scripts but...
+        // let's not worry about that for nowwwww :]
+        bool scrCast = Physics.Raycast(transform.position, checkDir, out hit, GRID_SIZE, modLayer);
+        if (scrCast) {
+            var hitScr = hit.collider.gameObject.GetComponent<ScriptTrigger>();
+            if (hitScr.myTrigger == ScriptTrigger.triggerType.touch) {
+                hitScr.RunScript();
             }
         }
     }
@@ -236,5 +251,18 @@ public class PlayerMove : MonoBehaviour {
         startAngle = transform.rotation;
 
         // TODO: event stuff
+    }
+
+
+
+    public GameObject MakeTextbox() {
+        var txtBox = Instantiate(P_TEXTBOX, UI.transform.position + (UI.transform.forward * 5) + new Vector3(0, -1.2f, 0), UI.transform.rotation);
+        
+        txtBox.transform.SetParent(UI.transform);
+        frozen = true;
+        var txtScr = txtBox.GetComponent<Textbox>();
+        txtScr.player = this;
+
+        return txtBox;
     }
 }

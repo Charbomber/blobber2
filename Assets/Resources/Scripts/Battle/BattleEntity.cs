@@ -17,6 +17,8 @@ public class BattleEntity : MonoBehaviour {
 
     Skill[] skillList = new Skill[]{};
 
+    public PlayerMove player;
+
     void Start() {
 
         // Init Bar Stats
