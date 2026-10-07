@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Audio;
 
 // PlayerMove has become quite the misnomer, right?
 // Shoulda just been 'Player'. Aw, hell.
@@ -82,6 +83,34 @@ public class PlayerMove : MonoBehaviour {
     // [         ]
 
     private GameObject P_TEXTBOX;
+
+    private AudioResource S_STEP;
+
+    // [                ]
+    // [ AUDIO CHANNELS ]
+    // [                ]
+
+    private AudioSource[] SOUND;
+    // quick enums for the channels
+    public enum CHANN : byte { // like, audio channel
+        MUSIC,
+        HIGH,  // high importance
+        LOW,   // low importance
+        STEPS  // footsteps
+    }
+
+    public enum SNDFLAG : byte { // flags for sounds
+        NONE      = 0,
+        PITCHBEND = 1 << 0 // random pitch bending
+        // more if i need more
+        // EXAMPLE = 1 << 1,
+        // EXAMPLE = 1 << 2,
+        // EXAMPLE = 1 << 3,
+        // EXAMPLE = 1 << 4,
+        // EXAMPLE = 1 << 5,
+        // EXAMPLE = 1 << 6,
+        // EXAMPLE = 1 << 7, || 128, highest it goes with bytes
+    }
     
 
     void Awake() {
@@ -94,7 +123,10 @@ public class PlayerMove : MonoBehaviour {
 
         UI = gameObject.transform.Find("UI").gameObject;
 
-        P_TEXTBOX = Resources.Load("Objects/Textbox") as GameObject;
+        InitPrefab();
+
+        SOUND = GetComponents<AudioSource>();
+        SOUND[(int)CHANN.MUSIC].loop = true;
     }
     
     void Start() {
@@ -152,6 +184,8 @@ public class PlayerMove : MonoBehaviour {
 
             if (moveCast) {return;} // no movement if there's something in the way
 
+            PlaySound(S_STEP, CHANN.STEPS, 0.5f, SNDFLAG.PITCHBEND);
+
             // set movement target
             targetPos = transform.position + (transform.forward * GRID_SIZE);
             targetAngle = startAngle;
@@ -185,6 +219,8 @@ public class PlayerMove : MonoBehaviour {
 
             if (moveCast) {return;} // no movement if there's something in the way
 
+            PlaySound(S_STEP, CHANN.STEPS, 0.5f, SNDFLAG.PITCHBEND);
+
             targetPos = transform.position + (-transform.forward * GRID_SIZE);
             targetAngle = startAngle;
 
@@ -214,7 +250,7 @@ public class PlayerMove : MonoBehaviour {
             // lets get the MovementModifier
             var hitOb = hit.collider.gameObject.GetComponent<MovementModifier>();
             // If on the same layer as us or on layer -1...
-            if (hitOb.myHeight == worldHeight || hitOb.myHeight == -1) {
+            if (hitOb && hitOb.myHeight == worldHeight || hitOb.myHeight == -1) {
                 // affect movement target
                 targetPos += hitOb.moveMod;
                 targetAngle = Quaternion.Euler(targetAngle.eulerAngles + hitOb.rotMod);
@@ -228,7 +264,7 @@ public class PlayerMove : MonoBehaviour {
         bool scrCast = Physics.Raycast(transform.position, checkDir, out hit, GRID_SIZE, modLayer);
         if (scrCast) {
             var hitScr = hit.collider.gameObject.GetComponent<ScriptTrigger>();
-            if (hitScr.myTrigger == ScriptTrigger.triggerType.touch) {
+            if (hitScr && hitScr.myTrigger == ScriptTrigger.triggerType.touch) {
                 hitScr.RunScript();
             }
         }
@@ -264,5 +300,24 @@ public class PlayerMove : MonoBehaviour {
         txtScr.player = this;
 
         return txtBox;
+    }
+
+    public void PlaySound(AudioResource sfx, CHANN channel, float volume, SNDFLAG soundflags) {
+        var mySound = SOUND[(int)channel];
+        mySound.Stop();
+        mySound.resource = sfx;
+        // volume
+        mySound.volume = volume;
+        // pitchbend
+        if (((byte)soundflags & (byte)SNDFLAG.PITCHBEND) > 0) {mySound.pitch = Random.Range(0.7f, 1.3f);} else {mySound.pitch = 1.0f;}
+        mySound.Play();
+    }
+
+
+
+    void InitPrefab() {
+        P_TEXTBOX = Resources.Load("Objects/Textbox") as GameObject;
+
+        S_STEP = Resources.Load("SE/footstep") as AudioResource;
     }
 }
