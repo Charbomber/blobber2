@@ -168,15 +168,15 @@ public class PlayerMove : MonoBehaviour {
 
         if (frozen)    {return;} // No input while events are happening
 
-        // TODO: Remove this testing script
-        if (myConfirm) {
+        // Testing script for dialogue boxes
+        /*if (myConfirm) {
             var txtbox = Instantiate(P_TEXTBOX, UI.transform.position + (UI.transform.forward * 5) + new Vector3(0, -1.2f, 0), UI.transform.rotation);
             txtbox.transform.SetParent(UI.transform);
             frozen = true;
             var txtScr = txtbox.GetComponent<Textbox>();
             txtScr.player = this;
             txtScr.text = "What a long string!\nI hope the player reads it.\nI wonder if it cuts off?\n...\n...Oh!\nHere's the rest!";
-        }
+        }*/
 
         if (dir.y > 0.5f) { // [FORWARDS]
             
@@ -261,10 +261,12 @@ public class PlayerMove : MonoBehaviour {
         // let's also check for script triggers here
         // I realize this also means tiles with movement modifiers can't also have scripts but...
         // let's not worry about that for nowwwww :]
-        bool scrCast = Physics.Raycast(transform.position, checkDir, out hit, GRID_SIZE, modLayer);
+        bool scrCast = Physics.Raycast(transform.position, checkDir, out hit, GRID_SIZE, trigLayer);
         if (scrCast) {
+            //Debug.Log("HIT A SCRCAST");
             var hitScr = hit.collider.gameObject.GetComponent<ScriptTrigger>();
             if (hitScr && hitScr.myTrigger == ScriptTrigger.triggerType.touch) {
+                //Debug.Log("ITS A TOUCH");
                 hitScr.RunScript();
             }
         }
@@ -285,8 +287,6 @@ public class PlayerMove : MonoBehaviour {
         // reset this for movement
         startPos   = transform.position;
         startAngle = transform.rotation;
-
-        // TODO: event stuff
     }
 
 

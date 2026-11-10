@@ -5,24 +5,67 @@ using System.IO;
 // realized i should probably. just make these their own classes.
 public class ScriptInterpret {
 
+    const int maxArg = 8;
+
     // using a plain string
     public string[,] Txt2Prog(string program) {
         var reader = new StringReader(program);
 
         bool slashMode = false;
-        //int sds = 0;
+        //int sds = 0; ??? what was I doing with this. whatever, forever immortalized in the comments
+
+
+        var numLines = program.Split('\n').Length;
+        var myReturn = new string[numLines,maxArg];
+
+        var argReport = 0;
+        var commandReport = 0;
 
         int i = 0;
         for (i=0;i<program.Length;i++) {
-            var chr = reader.Read();
+            char chr = (char)reader.Read();
             if (slashMode) { // vastly different behaviours based on slash mode
+                // exit slash mode unless specified otherwise
+                slashMode = false;
 
+                switch (chr) {
+                    case 'n':
+                        // newline (no report)
+                        myReturn[commandReport, argReport] += "\n";
+                        break;
+                }
             } else {
+                // slash mode
+                if (chr == '\\') {
+                    slashMode = true;
+                    continue;
+                }
 
+                if (chr == ';') {
+                    // report new argument
+                    if (argReport >= maxArg) { // no more arguments!!!!
+                        Debug.Log("<color=red>[SCR-ERR]</color> Problem adding arguments. (Too many arguments!)");
+                        continue;
+                    }
+                    argReport++;
+                    i++;
+                    reader.Read();
+                    continue;
+                }
+
+                if (chr == '\n') {
+                    // report new command
+                    commandReport++;
+                    argReport = 0;
+                    continue;
+                }
+
+                // add character
+                myReturn[commandReport, argReport] += chr;
             }
         }
 
-        return new string[2,2];
+        return myReturn;
     }
 
     // overload for a TextAsset
@@ -33,8 +76,33 @@ public class ScriptInterpret {
 
 
     // Full-Program interpreting
-    public void Interpret(ScriptTrigger source, string[,] prog) {
+    public void Interpret(ScriptTrigger source, string[,] prog, int position) {
 
+        string[] args = new string[prog.GetLength(1)-1];
+        // oops quick argument getter
+        for (int j = 1; j<prog.GetLength(1); j++) {args[j-1] = prog[position, j];}
+        string nextCom;
+        if (position == prog.GetLength(0)-1) {
+            nextCom = "";
+        } else {
+            nextCom = prog[position+1, 0];
+        }
+        Interpret(source, prog[position, 0], args, nextCom);
+
+        // oops
+        // loop through command list an execute
+        /*for (int i = 0; i<prog.GetLength(0); i++) {
+            string[] args = new string[prog.GetLength(1)-1];
+            // oops quick argument getter
+            for (int j = 1; j<prog.GetLength(1); j++) {args[j-1] = prog[i, j];}
+            string nextCom;
+            if (i == prog.GetLength(0)-1) {
+                nextCom = "";
+            } else {
+                nextCom = prog[i+1, 0];
+            }
+            Interpret(source, prog[i, 0], args, nextCom);
+        }*/
     }
 
     // synonymous with Interpret(command, arguments, nextCommand)
@@ -117,6 +185,7 @@ public class ScriptInterpret {
                 Textbox txtScr = txtBox.GetComponent<Textbox>();
                 txtScr.nextbox = nextCommand == "txt" || nextCommand == "text";
                 txtScr.myScript = source;
+                txtScr.text = arguments[0];
                 break;
             case "txtDone": // sorry, dumb hacky workaround. i know im a lazy bitch
                 source.runningScript = true;

@@ -4109,7 +4109,7 @@ GameObject:
   - component: {fileID: 661611646}
   - component: {fileID: 661611645}
   - component: {fileID: 661611644}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: CutsceneTest1
   m_TagString: Untagged
   m_Icon: {fileID: 2800000, guid: 8d8863fbb41b923c8a79f809606b987d, type: 3}
@@ -4147,6 +4147,14 @@ MonoBehaviour:
   interactDist: 2
   interactString: Look
   progLoad: {fileID: 4900000, guid: 928f3384d198b203f805bdc8fe76d20c, type: 3}
+  pos: 0
+  scriptTimer: 0
+  timerMode: 0
+  runningScript: 0
+  Player: {fileID: 0}
+  PlayerMove: {fileID: 0}
+  PlayerStats: {fileID: 0}
+  PlayerBattle: {fileID: 0}
 --- !u!65 &661611645
 BoxCollider:
   m_ObjectHideFlags: 0

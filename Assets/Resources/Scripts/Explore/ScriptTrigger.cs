@@ -86,10 +86,16 @@ public class ScriptTrigger : MonoBehaviour {
                 }
             }
         }
+
+
+        if (runningScript) {
+            PlayerMove.ScriptInterpret.Interpret(this, myProgram, pos);
+            pos++;
+        }
     }
 
-    // shorthand for Interpret(myProgram);
     public void RunScript() {
-        PlayerMove.ScriptInterpret.Interpret(this, myProgram);
+        runningScript = true;
+        pos = 0;
     }
 }
